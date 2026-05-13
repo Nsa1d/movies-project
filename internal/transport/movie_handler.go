@@ -128,7 +128,7 @@ func (h *MovieHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, movie)
 }
 
-func (h MovieHandler) Delete(c *gin.Context) {
+func (h *MovieHandler) Delete(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ID должен быть числом"})

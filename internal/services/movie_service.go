@@ -6,6 +6,7 @@ import (
 	"movies-project/internal/repository"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 type MovieService interface {
@@ -35,14 +36,6 @@ func NewMovieService(movies repository.MovieRepository, genres repository.GenreR
 func (s *movieService) CreateMovie(req models.MovieUpsertRequest) (*models.Movie, error) {
 	if err := s.validateMovie(req); err != nil {
 		return nil, err
-	}
-
-	exists, err := s.genres.Exists(req.GenreID)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.New("жанра с таким ID не существует")
 	}
 
 	movie := &models.Movie{
@@ -126,7 +119,7 @@ func (s *movieService) validateMovie(req models.MovieUpsertRequest) error {
 	if req.Rating < 0 || req.Rating > 10 {
 		return errors.New("рейтинг должен быть от 0 до 10")
 	}
-	
+
 	if strings.TrimSpace(req.Country) == "" {
 		return errors.New("поле country не должно быть пустым")
 	}
@@ -137,7 +130,7 @@ func (s *movieService) validateMovie(req models.MovieUpsertRequest) error {
 		return errors.New("поле description не может быть пустым")
 	}
 
-	if len(trimmedDesc) < 10 || len(trimmedDesc) > 250 {
+	if utf8.RuneCountInString(trimmedDesc) < 10 || utf8.RuneCountInString(trimmedDesc) > 250 {
 		return errors.New("описание должно содержать от 10 до 250 символов")
 	}
 
@@ -147,7 +140,7 @@ func (s *movieService) validateMovie(req models.MovieUpsertRequest) error {
 	}
 	if !exists {
 		return errors.New("жанра с таким ID не существует")
-	} 
+	}
 
 	return nil
 }
