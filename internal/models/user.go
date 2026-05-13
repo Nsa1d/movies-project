@@ -2,8 +2,17 @@ package models
 
 import "gorm.io/gorm"
 
-type Movie struct {
+type User struct {
 	gorm.Model
-	Name   string `json:"name"`
-	Rating int
+	Username  string
+	Password  string
+	Login     string `gorm:"unique"`
+	Watchlist string `gorm:"unique"`
+	Rewiews   string
+}
+
+type Registration struct {
+	Username string
+	Password string
+	Login    string `gorm:"unique"`
 }
