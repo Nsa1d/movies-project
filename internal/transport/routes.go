@@ -8,8 +8,8 @@ import (
 
 func RegisterRoutes(
 	router *gin.Engine,
-	genreService services.GenreService,
 	movieService services.MovieService,
+	genreService services.GenreService,
 ) {
 	movieHandler := NewMovieHandler(movieService)
 	genreHandler := NewGenreHandler(genreService)

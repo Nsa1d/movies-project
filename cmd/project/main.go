@@ -23,11 +23,10 @@ func main() {
 	genreRepo := repository.NewGenreRepository(db)
 
 	movieService := services.NewMovieService(movieRepo, genreRepo)
-	genreService := services.NewGenreService(genre)
-
+	genreService := services.NewGenreService(genreRepo)
 
 	router := gin.Default()
-	transport.RegisterRoutes(router, genreService, movieService)
+	transport.RegisterRoutes(router, movieService, genreService)
 	//тут должна быть регистрация роутов
 
 	if err := router.Run(); err != nil {

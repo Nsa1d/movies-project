@@ -1,12 +1,9 @@
 package models
 
-import "gorm.io/gorm"
-
 type Genre struct {
-	gorm.Model
-	Name string
+	ID   uint   `gorm:"primaryKey" json:"id"`
+	Name string `json:"name"`
 }
-
 type GenreCreateRequest struct {
 	Name string `json:"name"`
 }

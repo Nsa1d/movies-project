@@ -15,11 +15,11 @@ type GenreHandler struct {
 func NewGenreHandler(genre services.GenreService) *GenreHandler {
 	return &GenreHandler{genre: genre}
 }
-func (g *GenreHandler) RegisterRoutes(r *gin.Engine) {
+func (h *GenreHandler) RegisterRoutes(r *gin.Engine) {
 	genre := r.Group("/genre")
 	{
-		genre.GET("/genre")
-		genre.POST("/genre")
+		genre.GET("", h.GetGenres)
+		genre.POST("", h.PostGenre)
 	}
 }
 
@@ -37,5 +37,16 @@ func (g *GenreHandler) PostGenre(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, genre)
+	c.JSON(http.StatusOK, genre)
+}
+
+func (h *GenreHandler) GetGenres(c *gin.Context) {
+	var genres []models.Genre
+
+	err := h.genre.GetAllGenres(&genres)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"data": genres})
 }
