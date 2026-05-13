@@ -29,7 +29,7 @@ func (g *genreService) CreateGenre(req models.GenreCreateRequest) (*models.Genre
 	var genre []models.Genre
 	trimmed := strings.TrimSpace(req.Name)
 
-	if req.Name == trimmed {
+	if trimmed == "" {
 		return nil, errors.New("name is required")
 	}
 
