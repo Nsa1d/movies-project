@@ -8,7 +8,8 @@ import (
 
 type GenreRepository interface {
 	GetAllGenre(g *[]models.Genre) error
-	CreateGenre(g models.Genre) (*models.Genre, error)
+	CreateGenre(g models.Genre) error
+	Exist(id uint) (bool, error)
 }
 type gormGenreRepository struct {
 	db *gorm.DB
@@ -25,9 +26,23 @@ func (genre *gormGenreRepository) GetAllGenre(g *[]models.Genre) error {
 	return nil
 }
 
-func (genre *gormGenreRepository) CreateGenre(g models.Genre) (*models.Genre, error) {
+func (genre *gormGenreRepository) CreateGenre(g models.Genre) error {
 	if err := genre.db.Create(&g).Error; err != nil {
-		return nil, err
+		return nil
 	}
-	return &g, nil
+	return nil
+}
+
+func (genre *gormGenreRepository) Exist(id uint) (bool, error) {
+	var count int64
+	err := genre.db.
+		Model(&models.Genre{}).
+		Where("id = ?", id).
+		Count(&count).
+		Error
+	if err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
 }
