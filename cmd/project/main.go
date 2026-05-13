@@ -14,16 +14,20 @@ import (
 func main() {
 	db := config.SetUpDatabaseConnection()
 
-	if err := db.AutoMigrate(&models.Genre{}); err != nil {
+	if err := db.AutoMigrate(&models.Genre{}, &models.Movie{}); err != nil {
 		log.Fatalf("не удалось выполнить миграции: %v", err)
 	}
 
 	//создание репозитория
-	genre := repository.NewGenreRepository(db)
+	movieRepo := repository.NewMovieRepository(db)
+	genreRepo := repository.NewGenreRepository(db)
+
+	movieService := services.NewMovieService(movieRepo, genreRepo)
 	genreService := services.NewGenreService(genre)
 
+
 	router := gin.Default()
-	transport.RegisterRoutes(router, genreService)
+	transport.RegisterRoutes(router, genreService, movieService)
 	//тут должна быть регистрация роутов
 
 	if err := router.Run(); err != nil {
