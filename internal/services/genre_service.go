@@ -25,7 +25,7 @@ func (s *genreService) GetAllGenres() ([]models.Genre, error) {
 	return s.genres.GetGenres()
 }
 
-func (g *genreService) CreateGenre(req models.GenreCreateRequest) (*models.Genre, error) {
+func (s *genreService) CreateGenre(req models.GenreCreateRequest) (*models.Genre, error) {
 	var genre []models.Genre
 	trimmed := strings.TrimSpace(req.Name)
 
@@ -49,7 +49,7 @@ func (g *genreService) CreateGenre(req models.GenreCreateRequest) (*models.Genre
 		Name: trimmed,
 	}
 
-	if err := g.genres.CreateGenre(createGenre); err != nil {
+	if err := s.genres.CreateGenre(createGenre); err != nil {
 		return nil, err
 	}
 	return createGenre, nil

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"movies-project/internal/models"
 
 	"gorm.io/gorm"
@@ -22,7 +23,10 @@ func NewGenreRepository(db *gorm.DB) GenreRepository {
 func (g *gormGenreRepository) GetGenres() ([]models.Genre, error) {
 	var genres []models.Genre
 	err := g.db.Find(&genres).Error
-	return genres, err
+	if err != nil {
+		return nil, errors.New("Genre not found")
+	}
+	return genres, nil
 }
 
 func (g *gormGenreRepository) CreateGenre(genre *models.Genre) error {

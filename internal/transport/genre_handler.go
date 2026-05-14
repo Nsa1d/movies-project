@@ -37,7 +37,7 @@ func (h *GenreHandler) PostGenre(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, genre)
+	c.JSON(http.StatusCreated, genre)
 }
 
 func (h *GenreHandler) GetGenres(c *gin.Context) {
@@ -46,5 +46,5 @@ func (h *GenreHandler) GetGenres(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusCreated, genres)
+	c.JSON(http.StatusOK, genres)
 }
