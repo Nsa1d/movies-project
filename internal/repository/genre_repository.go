@@ -7,7 +7,7 @@ import (
 )
 
 type GenreRepository interface {
-	GetGenres(genre *[]models.Genre) error
+	GetGenres() ([]models.Genre, error)
 	CreateGenre(genre *models.Genre) error
 	Exist(id uint) (bool, error)
 }
@@ -19,11 +19,10 @@ func NewGenreRepository(db *gorm.DB) GenreRepository {
 	return &gormGenreRepository{db: db}
 }
 
-func (g *gormGenreRepository) GetGenres(genre *[]models.Genre) error {
-	if err := g.db.Find(genre).Error; err != nil {
-		return err
-	}
-	return nil
+func (g *gormGenreRepository) GetGenres() ([]models.Genre, error) {
+	var genres []models.Genre
+	err := g.db.Find(&genres).Error
+	return genres, err
 }
 
 func (g *gormGenreRepository) CreateGenre(genre *models.Genre) error {

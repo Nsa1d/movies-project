@@ -9,20 +9,20 @@ import (
 )
 
 type GenreService interface {
-	GetAllGenres(genres *[]models.Genre) error
+	GetAllGenres() ([]models.Genre, error)
 	CreateGenre(req models.GenreCreateRequest) (*models.Genre, error)
 }
 
 type genreService struct {
-	genreRepo repository.GenreRepository
+	genres repository.GenreRepository
 }
 
-func NewGenreService(genreRepo repository.GenreRepository) GenreService {
-	return &genreService{genreRepo: genreRepo}
+func NewGenreService(genres repository.GenreRepository) GenreService {
+	return &genreService{genres: genres}
 }
 
-func (g *genreService) GetAllGenres(genres *[]models.Genre) error {
-	return g.genreRepo.GetGenres(genres)
+func (s *genreService) GetAllGenres() ([]models.Genre, error) {
+	return s.genres.GetGenres()
 }
 
 func (g *genreService) CreateGenre(req models.GenreCreateRequest) (*models.Genre, error) {
@@ -46,10 +46,10 @@ func (g *genreService) CreateGenre(req models.GenreCreateRequest) (*models.Genre
 	}
 
 	createGenre := &models.Genre{
-		Name: req.Name,
+		Name: trimmed,
 	}
 
-	if err := g.genreRepo.CreateGenre(createGenre); err != nil {
+	if err := g.genres.CreateGenre(createGenre); err != nil {
 		return nil, err
 	}
 	return createGenre, nil

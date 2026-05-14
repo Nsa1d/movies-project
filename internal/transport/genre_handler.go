@@ -9,11 +9,11 @@ import (
 )
 
 type GenreHandler struct {
-	genre services.GenreService
+	service services.GenreService
 }
 
-func NewGenreHandler(genre services.GenreService) *GenreHandler {
-	return &GenreHandler{genre: genre}
+func NewGenreHandler(service services.GenreService) *GenreHandler {
+	return &GenreHandler{service: service}
 }
 func (h *GenreHandler) RegisterRoutes(r *gin.Engine) {
 	genre := r.Group("/genre")
@@ -23,7 +23,7 @@ func (h *GenreHandler) RegisterRoutes(r *gin.Engine) {
 	}
 }
 
-func (g *GenreHandler) PostGenre(c *gin.Context) {
+func (h *GenreHandler) PostGenre(c *gin.Context) {
 	var req models.GenreCreateRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -31,9 +31,9 @@ func (g *GenreHandler) PostGenre(c *gin.Context) {
 		return
 	}
 
-	genre, err := g.genre.CreateGenre(req)
+	genre, err := h.service.CreateGenre(req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -41,12 +41,10 @@ func (g *GenreHandler) PostGenre(c *gin.Context) {
 }
 
 func (h *GenreHandler) GetGenres(c *gin.Context) {
-	var genres []models.Genre
-
-	err := h.genre.GetAllGenres(&genres)
+	genres, err := h.service.GetAllGenres()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"data": genres})
+	c.JSON(http.StatusCreated, genres)
 }

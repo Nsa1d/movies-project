@@ -4,15 +4,18 @@ import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
-	Username  string
-	Password  string
-	Login     string
-	Watchlist string
-	Rewiews   string
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+	Login    string `json:"login" binding:"required"`
 }
 
 type Registration struct {
-	Username string
-	Password string
-	Login    string
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+	Login    string `json:"login" binding:"required"`
+}
+
+type Login struct {
+	Login    string `json:"login" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
