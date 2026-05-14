@@ -7,7 +7,11 @@ import (
 	"strings"
 	"time"
 	"unicode/utf8"
+
+	"gorm.io/gorm"
 )
+
+var ErrMovieNotFound = errors.New("фильм не найден")
 
 type MovieService interface {
 	CreateMovie(req models.MovieUpsertRequest) (*models.Movie, error)
@@ -62,6 +66,9 @@ func (s *movieService) ListMovies(filter repository.MovieFilter) ([]models.Movie
 func (s *movieService) GetMovieByID(id uint) (*models.Movie, error) {
 	movie, err := s.movies.GetByID(id)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrMovieNotFound
+		}
 		return nil, err
 	}
 
@@ -69,12 +76,15 @@ func (s *movieService) GetMovieByID(id uint) (*models.Movie, error) {
 }
 
 func (s *movieService) UpdateMovie(id uint, req models.MovieUpsertRequest) (*models.Movie, error) {
-	if err := s.validateMovie(req); err != nil {
+	movie, err := s.movies.GetByID(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrMovieNotFound
+		}
 		return nil, err
 	}
 
-	movie, err := s.movies.GetByID(id)
-	if err != nil {
+	if err := s.validateMovie(req); err != nil {
 		return nil, err
 	}
 
@@ -95,9 +105,11 @@ func (s *movieService) UpdateMovie(id uint, req models.MovieUpsertRequest) (*mod
 
 func (s *movieService) DeleteMovie(id uint) error {
 	if _, err := s.movies.GetByID(id); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return err
+		}
 		return err
 	}
-
 	return s.movies.Delete(id)
 }
 
