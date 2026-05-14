@@ -2,8 +2,20 @@ package models
 
 import "gorm.io/gorm"
 
-type Movie struct {
+type User struct {
 	gorm.Model
-	Name   string `json:"name"`
-	Author string `json:"author"`
+	Username string `json:"username" binding:"required"`
+	Login    string `json:"login" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+type Registration struct {
+	Username string `json:"username" binding:"required"`
+	Login    string `json:"login" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+type Login struct {
+	Login    string `json:"login" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }

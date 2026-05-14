@@ -1,24 +1,51 @@
 package repository
 
 import (
-	"fmt"
+	"errors"
 	"movies-project/internal/models"
+
+	"gorm.io/gorm"
 )
 
 type GenreRepository interface {
-	// Exists проверяет существование жанра по ID
-	Exists(id uint) (bool, error)
+	GetGenres() ([]models.Genre, error)
+	CreateGenre(genre *models.Genre) error
+	Exist(id uint) (bool, error)
+}
+type gormGenreRepository struct {
+	db *gorm.DB
 }
 
-type MockGenreRepository struct{}
-
-func (m *MockGenreRepository) Exists(id uint) (bool, error) {
-	return id >= 1 && id <= 10, nil
+func NewGenreRepository(db *gorm.DB) GenreRepository {
+	return &gormGenreRepository{db: db}
 }
 
-func (m *MockGenreRepository) GetByID(id uint) (*models.Genre, error) {
-	if id >= 1 && id <= 10 {
-		return &models.Genre{ID: id, Name: "Жанр"}, nil
+func (g *gormGenreRepository) GetGenres() ([]models.Genre, error) {
+	var genres []models.Genre
+	err := g.db.Find(&genres).Error
+	if err != nil {
+		return nil, errors.New("Genre not found")
 	}
-	return nil, fmt.Errorf("жанр не найден")
+	return genres, nil
+}
+
+func (g *gormGenreRepository) CreateGenre(genre *models.Genre) error {
+	if genre == nil {
+		return nil
+	}
+	return g.db.Create(genre).Error
+}
+
+func (g *gormGenreRepository) Exist(id uint) (bool, error) {
+	var count int64
+	err := g.db.
+		Model(&models.Genre{}).
+		Where("id = ?", id).
+		Count(&count).
+		Error
+	if err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
 }

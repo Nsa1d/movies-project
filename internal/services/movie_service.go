@@ -134,7 +134,7 @@ func (s *movieService) validateMovie(req models.MovieUpsertRequest) error {
 		return errors.New("описание должно содержать от 10 до 250 символов")
 	}
 
-	exists, err := s.genres.Exists(req.GenreID)
+	exists, err := s.genres.Exist(req.GenreID)
 	if err != nil {
 		return err
 	}
