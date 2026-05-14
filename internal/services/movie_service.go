@@ -102,6 +102,14 @@ func (s *movieService) DeleteMovie(id uint) error {
 }
 
 func (s *movieService) validateMovie(req models.MovieUpsertRequest) error {
+	found, err := s.movies.GetByTitle(strings.TrimSpace(req.Title))
+	if err != nil {
+		return err
+	}
+	if found != nil {
+		return errors.New("фильм с таким названием уже существует")
+	}
+
 	if strings.TrimSpace(req.Title) == "" {
 		return errors.New("поле title не должно быть пустым")
 	}
@@ -116,8 +124,8 @@ func (s *movieService) validateMovie(req models.MovieUpsertRequest) error {
 		return errors.New("недопустимая длительность фильма")
 	}
 
-	if req.Rating < 0 || req.Rating > 10 {
-		return errors.New("рейтинг должен быть от 0 до 10")
+	if req.Rating < 1 || req.Rating > 10 {
+		return errors.New("рейтинг должен быть от 1 до 10")
 	}
 
 	if strings.TrimSpace(req.Country) == "" {

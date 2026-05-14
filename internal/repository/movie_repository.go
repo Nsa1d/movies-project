@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"movies-project/internal/models"
 
 	"gorm.io/gorm"
@@ -8,7 +9,7 @@ import (
 
 type MovieFilter struct {
 	GenreID *uint
-	Year *int
+	Year    *int
 }
 
 type MovieRepository interface {
@@ -21,6 +22,9 @@ type MovieRepository interface {
 	Update(movie *models.Movie) error
 
 	Delete(id uint) error
+
+	//сделал фильтр, чтобы не смогли добавить уже существующий фильм
+	GetByTitle(title string) (*models.Movie, error)
 }
 
 type gormMovieRepository struct {
@@ -79,4 +83,16 @@ func (r *gormMovieRepository) Update(movie *models.Movie) error {
 
 func (r *gormMovieRepository) Delete(id uint) error {
 	return r.db.Delete(&models.Movie{}, id).Error
+}
+
+func (r *gormMovieRepository) GetByTitle(title string) (*models.Movie, error) {
+	var movie models.Movie
+	err := r.db.Where("title = ?", title).First(&movie).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &movie, err
 }
