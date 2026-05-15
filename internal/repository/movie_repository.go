@@ -87,12 +87,12 @@ func (r *gormMovieRepository) Delete(id uint) error {
 
 func (r *gormMovieRepository) GetByTitle(title string) (*models.Movie, error) {
 	var movie models.Movie
-	err := r.db.Where("title = ?", title).First(&movie).Error
+	err := r.db.Where("LOWER(title) = LOWER(?)", title).First(&movie).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil
 	}
 	if err != nil {
 		return nil, err
 	}
-	return &movie, err
+	return &movie, nil
 }
