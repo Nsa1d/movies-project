@@ -8,7 +8,8 @@ import (
 
 type UserService interface {
 	GetUserByID(id uint) (*models.User, error)
-	CreatUser(reg *models.Registration) (*models.User, error)
+	CreateUser(reg models.Registration) (*models.User, error)
+	Authenticate(authy models.Login) (*models.User, error)
 }
 
 type userService struct {
@@ -23,15 +24,26 @@ func (s *userService) GetUserByID(id uint) (*models.User, error) {
 	return s.user.FindUserByID(id)
 }
 
-func (s *userService) CreatUser(reg models.Registration) (*models.User, error) {
+func (s *userService) CreateUser(reg models.Registration) (*models.User, error) {
 	var user models.User
+
+	if reg.Username == "" {
+		return nil, errors.New("пустое имя")
+	}
+	if reg.Password == "" {
+		return nil, errors.New("пустой пароль")
+	}
+	if reg.Login == "" {
+		return nil, errors.New("пустой логин")
+	}
+
 	if reg.Login == user.Login {
-		return errors.New("login is already taken")
+		return nil, errors.New("login is already taken")
 	}
 
 	register := &models.User{
 		Login:    reg.Login,
-		Name:     reg.Name,
+		Username: reg.Username,
 		Password: reg.Password,
 	}
 
@@ -39,5 +51,20 @@ func (s *userService) CreatUser(reg models.Registration) (*models.User, error) {
 		return nil, err
 	}
 
-	return &register, nil
+	return register, nil
+}
+
+func (s *userService) Authenticate(authy models.Login) (*models.User, error) {
+	if authy.Login == "" {
+		return nil, errors.New("логин пустой")
+	}
+	if authy.Password == "" {
+		return nil, errors.New("пароль пустой")
+	}
+
+	login := &models.Login{
+		Login:    authy.Login,
+		Password: authy.Password,
+	}
+	return s.user.Authentication(login)
 }
