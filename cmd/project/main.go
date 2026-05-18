@@ -28,7 +28,7 @@ func main() {
 	userService := services.NewUserService(userRepo)
 
 	router := gin.Default()
-	transport.RegisterRoutes(router, userService, movieService, genreService)
+	transport.RegisterRoutes(router, movieService, genreService, userService)
 	//тут должна быть регистрация роутов
 
 	if err := router.Run(); err != nil {

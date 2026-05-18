@@ -8,15 +8,15 @@ import (
 
 func RegisterRoutes(
 	router *gin.Engine,
-	userService services.UserService,
 	movieService services.MovieService,
 	genreService services.GenreService,
+	userService services.UserService,
 ) {
-	userHandler := NewUserHandler(userService)
 	movieHandler := NewMovieHandler(movieService)
 	genreHandler := NewGenreHandler(genreService)
+	userHandler := NewUserHandler(userService)
 
-	userHandler.RegisterRoutes(router)
 	movieHandler.RegisterRoutes(router)
 	genreHandler.RegisterRoutes(router)
+	userHandler.RegisterRoutes(router)
 }

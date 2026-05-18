@@ -4,6 +4,7 @@ import (
 	"errors"
 	"movies-project/internal/models"
 	"movies-project/internal/repository"
+	"strings"
 )
 
 type UserService interface {
@@ -21,7 +22,7 @@ func NewUserService(user repository.UserRepository) UserService {
 }
 
 func (s *userService) GetUserByID(id uint) (*models.User, error) {
-	return s.user.FindUserByID(id)
+	return s.user.GetByID(id)
 }
 
 func (s *userService) CreateUser(reg models.Registration) (*models.User, error) {
@@ -55,16 +56,32 @@ func (s *userService) CreateUser(reg models.Registration) (*models.User, error) 
 }
 
 func (s *userService) Authenticate(authy models.Login) (*models.User, error) {
-	if authy.Login == "" {
-		return nil, errors.New("логин пустой")
+	//errValid := s.validateAuth(authy)
+	//if errValid != nil {
+	//	return nil, errValid
+	//}
+	user, err := s.user.GetByLogin(authy.Login)
+	if err != nil {
+		return nil, err
 	}
-	if authy.Password == "" {
-		return nil, errors.New("пароль пустой")
+	if user.Password != authy.Password {
+		return nil, errors.New("неверный пароль")
 	}
 
-	login := &models.Login{
-		Login:    authy.Login,
-		Password: authy.Password,
+	return user, nil
+}
+
+func (s *userService) validateAuth(req models.Login) error {
+	loginTrimspace := strings.TrimSpace(req.Login)
+	passTrimSpace := strings.TrimSpace(req.Password)
+
+	if len(loginTrimspace) > 0 {
+		return errors.New("логин обязателен")
 	}
-	return s.user.Authentication(login)
+
+	if len(passTrimSpace) > 0 {
+		return errors.New("пароль обязателен")
+	}
+
+	return nil
 }

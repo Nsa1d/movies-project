@@ -35,12 +35,12 @@ func (h *UserHandler) Register(c *gin.Context) {
 		return
 	}
 
-	user, err := h.service.CreateUser(reg)
+	_, err := h.service.CreateUser(reg)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{"user": user})
+	c.JSON(http.StatusCreated, gin.H{"message": "вы успешно зарегались"})
 }
 
 func (h *UserHandler) GetUser(c *gin.Context) {
@@ -67,10 +67,10 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	user, err := h.service.Authenticate(authy)
+	_, err := h.service.Authenticate(authy)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"user": user})
+	c.JSON(http.StatusOK, gin.H{"message": "вы успешно вошли"})
 }
