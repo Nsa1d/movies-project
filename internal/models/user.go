@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
-	Username string `json:"username" binding:"required"`
+	Username string `gorm:"unique" json:"username" binding:"required"`
 	Login    string `json:"login" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }

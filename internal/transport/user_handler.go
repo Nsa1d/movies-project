@@ -69,7 +69,8 @@ func (h *UserHandler) Login(c *gin.Context) {
 
 	_, err := h.service.Authenticate(authy)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "вы успешно вошли"})
