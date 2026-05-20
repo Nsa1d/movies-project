@@ -11,6 +11,7 @@ type UserRepository interface {
 	CreateUserRegister(register *models.User) error
 	GetByID(id uint) (*models.User, error)
 	GetByLogin(login string) (*models.User, error)
+	Exist(id uint) (bool, error)
 }
 type gormUserRepository struct {
 	db *gorm.DB
@@ -42,4 +43,18 @@ func (r *gormUserRepository) GetByLogin(login string) (*models.User, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (g *gormUserRepository) Exist(id uint) (bool, error) {
+	var count int64
+	err := g.db.
+		Model(&models.User{}).
+		Where("id = ?", id).
+		Count(&count).
+		Error
+	if err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
 }
