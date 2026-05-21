@@ -4,8 +4,8 @@ import (
 	"errors"
 	"movies-project/internal/models"
 	"movies-project/internal/repository"
+	"regexp"
 	"strings"
-	"unicode"
 )
 
 type GenreService interface {
@@ -26,31 +26,38 @@ func (s *genreService) GetAllGenres() ([]models.Genre, error) {
 }
 
 func (s *genreService) CreateGenre(req models.GenreCreateRequest) (*models.Genre, error) {
-	var genre []models.Genre
-	trimmed := strings.TrimSpace(req.Name)
-
-	if trimmed == "" {
-		return nil, errors.New("name is required")
-	}
-
-	for _, g := range genre {
-		if g.Name == req.Name {
-			return nil, errors.New("name is duplicated")
-		}
-	}
-
-	for _, ch := range trimmed {
-		if unicode.IsDigit(ch) {
-			return nil, errors.New("name is invalid")
-		}
+	errValid := s.genreValidate(req)
+	if errValid != nil {
+		return nil, errValid
 	}
 
 	createGenre := &models.Genre{
-		Name: trimmed,
+		Name: req.Name,
 	}
 
 	if err := s.genres.CreateGenre(createGenre); err != nil {
 		return nil, err
 	}
 	return createGenre, nil
+}
+
+func (s *genreService) genreValidate(req models.GenreCreateRequest) error {
+	var genre models.Genre
+	pattern := `[а-яА-Я]+$`
+	genreValidate := regexp.MustCompile(pattern)
+	genreTrimmed := strings.TrimSpace(req.Name)
+
+	if genreTrimmed == "" {
+		return errors.New("имя пустое")
+	}
+
+	if !genreValidate.MatchString(genreTrimmed) {
+		return errors.New("название жанра должно быть только на русском")
+	}
+
+	if genreTrimmed == genre.Name {
+		return errors.New("такой жанр уже есть")
+	}
+
+	return nil
 }

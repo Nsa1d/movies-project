@@ -43,7 +43,7 @@ func (h *GenreHandler) PostGenre(c *gin.Context) {
 func (h *GenreHandler) GetGenres(c *gin.Context) {
 	genres, err := h.service.GetAllGenres()
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, genres)
