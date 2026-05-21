@@ -46,7 +46,8 @@ func (s *movieService) CreateMovie(req models.MovieUpsertRequest) (*models.Movie
 		Title:       strings.TrimSpace(req.Title),
 		Year:        req.Year,
 		DurationMin: req.DurationMin,
-		Rating:      req.Rating,
+		Rating:      0,
+		RatingCount: 0,
 		Country:     strings.TrimSpace(req.Country),
 		Description: strings.TrimSpace(req.Description),
 		GenreID:     req.GenreID,
@@ -91,7 +92,7 @@ func (s *movieService) UpdateMovie(id uint, req models.MovieUpsertRequest) (*mod
 	movie.Title = strings.TrimSpace(req.Title)
 	movie.Year = req.Year
 	movie.DurationMin = req.DurationMin
-	movie.Rating = req.Rating
+	movie.Rating = movie.Rating
 	movie.Country = strings.TrimSpace(req.Country)
 	movie.Description = strings.TrimSpace(req.Description)
 	movie.GenreID = req.GenreID
