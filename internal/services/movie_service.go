@@ -11,8 +11,6 @@ import (
 	"gorm.io/gorm"
 )
 
-var ErrMovieNotFound = errors.New("фильм не найден")
-
 type MovieService interface {
 	CreateMovie(req models.MovieUpsertRequest) (*models.Movie, error)
 
@@ -46,7 +44,8 @@ func (s *movieService) CreateMovie(req models.MovieUpsertRequest) (*models.Movie
 		Title:       strings.TrimSpace(req.Title),
 		Year:        req.Year,
 		DurationMin: req.DurationMin,
-		Rating:      req.Rating,
+		Rating:      0,
+		RatingCount: 0,
 		Country:     strings.TrimSpace(req.Country),
 		Description: strings.TrimSpace(req.Description),
 		GenreID:     req.GenreID,
@@ -67,7 +66,7 @@ func (s *movieService) GetMovieByID(id uint) (*models.Movie, error) {
 	movie, err := s.movies.GetByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, ErrMovieNotFound
+			return nil, err
 		}
 		return nil, err
 	}
@@ -79,7 +78,7 @@ func (s *movieService) UpdateMovie(id uint, req models.MovieUpsertRequest) (*mod
 	movie, err := s.movies.GetByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, ErrMovieNotFound
+			return nil, err
 		}
 		return nil, err
 	}

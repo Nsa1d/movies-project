@@ -10,6 +10,7 @@ type Movie struct {
 	Year        int     `json:"year"`
 	DurationMin int     `json:"duration_min"`
 	Rating      float64 `json:"rating"`
+	RatingCount int     `json:"rating_count"`
 	Country     string  `json:"country"`
 	Description string  `json:"description"`
 	GenreID     uint    `json:"genre_id"`
@@ -20,8 +21,8 @@ type MovieUpsertRequest struct {
 	Year        int     `json:"year"`
 	DurationMin int     `json:"duration_min"`
 	Rating      float64 `json:"rating"`
+	RatingCount int     `json:"rating_count"`
 	Country     string  `json:"country"`
 	Description string  `json:"description"`
 	GenreID     uint    `json:"genre_id"`
 }
-
