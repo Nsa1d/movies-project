@@ -49,17 +49,17 @@ func (s *watchlistService) DeleteWatchlist(id uint) error {
 }
 
 func (s *watchlistService) GetWatchlist(id uint) (*models.Watchlist, error) {
-	if _, err := s.user.Exist(id); err != nil {
+	if _, err := s.user.GetByID(id); err != nil {
 		return nil, errors.New("неверный id")
 	}
 	return s.watchlist.FindWatchlist(id)
 }
 
 func (s *watchlistService) validatePost(req models.WatchlistRequest) error {
-	if _, err := s.movie.Exist(req.MovieID); err != nil {
+	if _, err := s.movie.GetByID(req.MovieID); err != nil {
 		return errors.New("фильма с таким id не существует")
 	}
-	if _, err := s.user.Exist(req.UserID); err != nil {
+	if _, err := s.user.GetByID(req.UserID); err != nil {
 		return errors.New("пользователя с таким id не существует")
 	}
 	return nil

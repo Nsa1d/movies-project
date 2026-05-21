@@ -1,12 +1,14 @@
 package transport
 
 import (
+	"errors"
 	"movies-project/internal/models"
 	"movies-project/internal/services"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type WatchlistHandler struct {
@@ -31,49 +33,52 @@ func (h *WatchlistHandler) RegisterRoutes(r *gin.Engine) {
 
 func (h *WatchlistHandler) Post(c *gin.Context) {
 	var req models.WatchlistRequest
-	err := c.ShouldBindJSON(req)
-	if err != nil {
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	_, err = h.service.PostWatchlist(req)
-	if err != nil {
+	if _, err := h.service.PostWatchlist(req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"message": "список просмотренного успешно создан"})
 }
 
 func (h *WatchlistHandler) Delete(c *gin.Context) {
-	index := c.Param("id")
-	id, err := strconv.Atoi(index)
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id должен быть числом"})
 		return
 	}
 	err = h.service.DeleteWatchlist(uint(id))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "запись с таким id не найдена"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "список просмотренного удален"})
+	c.JSON(http.StatusOK, gin.H{})
 }
 
 func (h *WatchlistHandler) Get(c *gin.Context) {
-	index := c.Param("id")
-	id, err := strconv.Atoi(index)
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id должен быть числом"})
 		return
 	}
 
 	wList, err := h.service.GetWatchlist(uint(id))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "запись с таким id не найдена"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": wList})
+	c.JSON(http.StatusOK, wList)
 }

@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"errors"
 	"movies-project/internal/models"
 
 	"gorm.io/gorm"
@@ -28,14 +27,14 @@ func (r *gormGenreRepository) CreateWatchlist(watchlist *models.Watchlist) error
 }
 
 func (r *gormGenreRepository) DeleteWatchlist(id uint) error {
-	return r.db.Delete(&models.Watchlist{}, "id = ?", id).Error
+	return r.db.Delete(&models.Watchlist{}, id).Error
 }
 
 func (r *gormGenreRepository) FindWatchlist(id uint) (*models.Watchlist, error) {
 	var wList models.Watchlist
-	err := r.db.Where("id = ?", id).First(&wList).Error
+	err := r.db.First(&wList, id).Error
 	if err != nil {
-		return nil, errors.New("список просмотренного с таким id не найден")
+		return nil, err
 	}
 	return &wList, nil
 }

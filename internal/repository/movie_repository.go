@@ -25,8 +25,6 @@ type MovieRepository interface {
 
 	//сделал фильтр, чтобы не смогли добавить уже существующий фильм
 	GetByTitle(title string) (*models.Movie, error)
-
-	Exist(id uint) (bool, error)
 }
 
 type gormMovieRepository struct {
@@ -97,18 +95,4 @@ func (r *gormMovieRepository) GetByTitle(title string) (*models.Movie, error) {
 		return nil, err
 	}
 	return &movie, nil
-}
-
-func (g *gormMovieRepository) Exist(id uint) (bool, error) {
-	var count int64
-	err := g.db.
-		Model(&models.Movie{}).
-		Where("id = ?", id).
-		Count(&count).
-		Error
-	if err != nil {
-		return false, err
-	}
-
-	return count > 0, nil
 }
